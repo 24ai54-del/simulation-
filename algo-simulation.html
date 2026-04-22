@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algorithm Simulations</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --card: #181c24;
+    --border: #252b38;
+    --accent1: #00e5ff;
+    --accent2: #ff6b35;
+    --accent3: #39ff82;
+    --danger: #ff3d5a;
+    --warning: #ffd23f;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --font-mono: 'Space Mono', monospace;
+    --font-display: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-display);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
+
+  /* Header */
+  header {
+    padding: 40px 0 30px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent1);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  header h1 {
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--accent1), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 8px;
+    font-family: var(--font-mono);
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin: 30px 0 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab-btn {
+    padding: 14px 32px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent1);
+    transform: scaleX(0);
+    transition: transform 0.25s;
+  }
+
+  .tab-btn.active { color: var(--accent1); }
+  .tab-btn.active::after { transform: scaleX(1); }
+  .tab-btn:hover { color: var(--text); }
+
+  /* Tab Panels */
+  .tab-panel { display: none; padding: 30px 0 60px; }
+  .tab-panel.active { display: block; }
+
+  /* Section Headers */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .section-label .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent1);
+    box-shadow: 0 0 10px var(--accent1);
+  }
+
+  .section-label h2 {
+    font-size: 13px;
+    font-family: var(--font-mono);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent1);
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-size: 12px;
+    font-family: var(--font-mono);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  /* Buttons */
+  .btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: var(--accent1);
+    color: var(--bg);
+  }
+  .btn-primary:hover { background: #33eeff; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,229,255,0.3); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+  }
+  .btn-secondary:hover { background: rgba(255,107,53,0.1); }
+
+  .btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+  }
+  .btn-danger:hover { background: rgba(255,61,90,0.1); }
+
+  .btn-success {
+    background: var(--accent3);
+    color: var(--bg);
+  }
+  .btn-success:hover { background: #5fffa0; }
+
+  .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+  /* Inputs */
+  input[type="number"], input[type="text"] {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    width: 70px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+  input:focus { outline: none; border-color: var(--accent1); }
+
+  /* Tables */
+  .matrix-table { border-collapse: collapse; width: 100%; }
+  .matrix-table th {
+    background: var(--surface);
+    color: var(--accent1);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 10px 14px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .matrix-table td {
+    padding: 8px 10px;
+    text-align: center;
+    border: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+  .matrix-table tr:hover td { background: rgba(0,229,255,0.04); }
+
+  .row-label {
+    color: var(--accent2);
+    font-weight: 700;
+    font-size: 12px;
+    background: var(--surface) !important;
+  }
+
+  /* Status badges */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+  }
+  .badge-safe { background: rgba(57,255,130,0.15); color: var(--accent3); border: 1px solid rgba(57,255,130,0.3); }
+  .badge-unsafe { background: rgba(255,61,90,0.15); color: var(--danger); border: 1px solid rgba(255,61,90,0.3); }
+  .badge-warn { background: rgba(255,210,63,0.15); color: var(--warning); border: 1px solid rgba(255,210,63,0.3); }
+  .badge-info { background: rgba(0,229,255,0.12); color: var(--accent1); border: 1px solid rgba(0,229,255,0.25); }
+
+  /* Log / Output */
+  .log-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.8;
+    max-height: 280px;
+    overflow-y: auto;
+    min-height: 60px;
+  }
+  .log-box::-webkit-scrollbar { width: 4px; }
+  .log-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .log-safe { color: var(--accent3); }
+  .log-unsafe { color: var(--danger); }
+  .log-info { color: var(--accent1); }
+  .log-warn { color: var(--warning); }
+  .log-muted { color: var(--muted); }
+  .log-step { color: var(--text); }
+
+  /* Grid layouts */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+  @media (max-width: 768px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* ===== BANKER'S ALGORITHM ===== */
+
+  .resource-config {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .resource-config label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .safe-sequence {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .seq-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: rgba(57,255,130,0.12);
+    border: 2px solid var(--accent3);
+    color: var(--accent3);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 13px;
+    animation: popIn 0.3s ease;
+  }
+
+  .seq-arrow {
+    color: var(--muted);
+    font-size: 16px;
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  /* Process state highlight */
+  .process-safe td { background: rgba(57,255,130,0.05) !important; }
+  .process-unsafe td { background: rgba(255,61,90,0.05) !important; }
+
+  /* ===== BELLMAN-FORD ===== */
+
+  canvas {
+    display: block;
+    width: 100%;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .graph-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .graph-controls select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .edge-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .edge-input label { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+
+  .dist-table { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .dist-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    min-width: 55px;
+    transition: all 0.3s;
+  }
+  .dist-cell.updated { border-color: var(--accent1); background: rgba(0,229,255,0.08); }
+  .dist-cell.source { border-color: var(--accent3); background: rgba(57,255,130,0.08); }
+  .dist-cell .node-name { font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .dist-cell .node-dist { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
+  .dist-cell .node-prev { font-family: var(--font-mono); font-size: 10px; color: var(--accent2); margin-top: 2px; }
+
+  .speed-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .speed-control input[type="range"] { width: 100px; accent-color: var(--accent1); }
+
+  /* Negative cycle warning */
+  .neg-cycle-alert {
+    background: rgba(255,61,90,0.1);
+    border: 1px solid var(--danger);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--danger);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    display: none;
+    margin-top: 12px;
+  }
+  .neg-cycle-alert.show { display: block; }
+
+  /* Tooltip */
+  .tooltip {
+    position: absolute;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    pointer-events: none;
+    z-index: 100;
+    display: none;
+  }
+
+  /* Animations */
+  @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+  .fade-in { animation: fadeIn 0.4s ease forwards; }
+
+  /* Glowing divider */
+  .glow-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent1), transparent);
+    margin: 24px 0;
+    opacity: 0.4;
+  }
+
+  /* Info pills */
+  .info-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .info-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .info-pill span { color: var(--accent1); font-weight: 700; }
+
+  /* Step indicator */
+  .step-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+  .step-counter .step-num {
+    background: rgba(0,229,255,0.12);
+    border: 1px solid rgba(0,229,255,0.25);
+    border-radius: 4px;
+    padding: 2px 8px;
+    color: var(--accent1);
+  }
+
+  /* Table overflow wrapper */
+  .table-wrap { overflow-x: auto; }
+
+  /* highlight animation for table cells */
+  @keyframes cellPulse {
+    0% { background: rgba(0,229,255,0.25); }
+    100% { background: transparent; }
+  }
+  .cell-flash { animation: cellPulse 0.6s ease; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="header-tag">// algorithm simulation lab</div>
+    <h1>OS & Graph Algorithms</h1>
+    <p>Interactive model simulation · Banker's Algorithm · Bellman-Ford Algorithm</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('bankers')">🏦 Banker's Algorithm</button>
+    <button class="tab-btn" onclick="switchTab('bellman')">🗺 Bellman-Ford Algorithm</button>
+  </div>
+
+  <!-- ===================== BANKER'S ALGORITHM ===================== -->
+  <div id="tab-bankers" class="tab-panel active fade-in">
+
+    <div class="card">
+      <div class="card-title">// system configuration</div>
+      <div class="resource-config">
+        <label>PROCESSES (n)</label>
+        <input type="number" id="b-procs" value="5" min="2" max="8" style="width:60px">
+        <label>RESOURCES (m)</label>
+        <input type="number" id="b-res" value="3" min="1" max="5" style="width:60px">
+        <button class="btn btn-primary" onclick="initBankers()">INITIALIZE</button>
+        <button class="btn btn-secondary" onclick="loadBankersPreset()">LOAD PRESET</button>
+      </div>
+    </div>
+
+    <div id="bankers-matrices" style="display:none">
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">// available resources</div>
+          <div id="available-container"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">// algorithm legend</div>
+          <div style="font-family:var(--font-mono);font-size:11px;line-height:2;color:var(--muted)">
+            <span style="color:var(--accent1)">ALLOCATION</span> — resources currently held by each process<br>
+            <span style="color:var(--accent2)">MAX</span> — max demand each process may ever request<br>
+            <span style="color:var(--accent3)">NEED</span> — MAX − ALLOCATION (remaining need)<br>
+            <span style="color:var(--warning)">AVAILABLE</span> — resources free in the system<br>
+            <br>
+            <span style="color:var(--text)">Safe State:</span> ∃ safe sequence P₀→P₁→…→Pₙ
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">// allocation matrix</div>
+        <div class="table-wrap"><div id="alloc-matrix"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">// max demand matrix</div>
+        <div class="table-wrap"><div id="max-matrix"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">// need matrix (computed: max − allocation)</div>
+        <div class="table-wrap"><div id="need-matrix"></div></div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-success" onclick="runBankersStep()">▶ RUN SAFETY ALGORITHM</button>
+        <button class="btn btn-secondary" onclick="requestResourceDialog()">📥 RESOURCE REQUEST</button>
+        <button class="btn btn-danger" onclick="resetBankers()">↺ RESET</button>
+      </div>
+
+      <div class="card" id="bankers-result" style="display:none;margin-top:20px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div class="card-title" style="margin:0">// safety analysis result</div>
+          <div id="safety-badge"></div>
+          <div class="step-counter">ITERATION <span class="step-num" id="iter-count">0</span></div>
+        </div>
+        <div id="safe-seq-container" style="margin-bottom:14px"></div>
+        <div class="log-box" id="bankers-log"></div>
+      </div>
+
+      <!-- Resource Request Dialog (inline) -->
+      <div class="card" id="request-dialog" style="display:none;margin-top:20px;border-color:var(--accent2)">
+        <div class="card-title">// resource request simulation</div>
+        <div class="edge-input">
+          <label>PROCESS</label>
+          <select id="req-process" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:6px;font-family:var(--font-mono);font-size:12px"></select>
+          <label style="margin-left:10px">REQUEST VECTOR</label>
+          <div id="req-inputs"></div>
+          <button class="btn btn-secondary" onclick="processRequest()" style="margin-left:10px">SUBMIT REQUEST</button>
+          <button class="btn btn-danger" onclick="document.getElementById('request-dialog').style.display='none'">CLOSE</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================== BELLMAN-FORD ===================== -->
+  <div id="tab-bellman" class="tab-panel fade-in">
+
+    <div class="card">
+      <div class="card-title">// graph configuration</div>
+      <div class="graph-controls">
+        <label style="font-family:var(--font-mono);font-size:12px;color:var(--muted)">PRESET:</label>
+        <select id="bf-preset" onchange="loadBFPreset()">
+          <option value="default">Standard Graph (5 nodes)</option>
+          <option value="negative">Negative Weights Example</option>
+          <option value="negcycle">Negative Cycle Detection</option>
+          <option value="map">City Route Map</option>
+        </select>
+        <label style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-left:10px">SOURCE:</label>
+        <select id="bf-source" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:6px;font-family:var(--font-mono);font-size:12px"></select>
+        <div class="speed-control">
+          <span>SPEED</span>
+          <input type="range" id="bf-speed" min="200" max="2000" value="800" step="100">
+          <span id="speed-label">800ms</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <div class="card">
+          <div class="card-title">// graph visualization</div>
+          <canvas id="bf-canvas" width="560" height="340"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title">// edge list</div>
+          <div class="table-wrap">
+            <table class="matrix-table" id="edge-table">
+              <thead><tr>
+                <th>FROM</th><th>TO</th><th>WEIGHT</th>
+              </tr></thead>
+              <tbody id="edge-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="card-title">// distance table</div>
+          <div class="dist-table" id="dist-display"></div>
+          <div id="neg-cycle-alert" class="neg-cycle-alert">
+            ⚠ NEGATIVE CYCLE DETECTED — Bellman-Ford cannot compute shortest paths. Shortest path is −∞ for affected nodes.
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">// algorithm trace log</div>
+          <div class="log-box" id="bf-log"></div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-success" onclick="runBFStep()">▶ RUN BELLMAN-FORD</button>
+          <button class="btn btn-primary" onclick="stepBF()">⏭ STEP</button>
+          <button class="btn btn-danger" onclick="resetBF()">↺ RESET</button>
+        </div>
+        <div class="info-row" style="margin-top:14px">
+          <div class="info-pill">ITERATION <span id="bf-iter">0</span> / <span id="bf-max-iter">?</span></div>
+          <div class="info-pill">RELAXATIONS <span id="bf-relax">0</span></div>
+          <div class="info-pill">STATUS <span id="bf-status">IDLE</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// =========================================================
+//  TAB SWITCHING
+// =========================================================
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['bankers','bellman'][i] === name);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'bellman') setTimeout(() => drawBFGraph(), 50);
+}
+
+// =========================================================
+//  BANKER'S ALGORITHM
+// =========================================================
+let bN = 5, bM = 3;
+let bAlloc = [], bMax = [], bAvail = [];
+let bRunning = false;
+
+function initBankers() {
+  bN = parseInt(document.getElementById('b-procs').value) || 5;
+  bM = parseInt(document.getElementById('b-res').value) || 3;
+  bAlloc = Array.from({length:bN}, () => Array(bM).fill(0));
+  bMax   = Array.from({length:bN}, () => Array(bM).fill(0));
+  bAvail = Array(bM).fill(0);
+  document.getElementById('bankers-matrices').style.display = 'block';
+  document.getElementById('bankers-result').style.display = 'none';
+  document.getElementById('request-dialog').style.display = 'none';
+  renderBankers();
+}
+
+function loadBankersPreset() {
+  bN = 5; bM = 3;
+  document.getElementById('b-procs').value = 5;
+  document.getElementById('b-res').value = 3;
+  bAlloc = [[0,1,0],[2,0,0],[3,0,2],[2,1,1],[0,0,2]];
+  bMax   = [[7,5,3],[3,2,2],[9,0,2],[2,2,2],[4,3,3]];
+  bAvail = [3,3,2];
+  document.getElementById('bankers-matrices').style.display = 'block';
+  document.getElementById('bankers-result').style.display = 'none';
+  renderBankers();
+  logBankers('<span class="log-info">// Preset loaded: Classic Banker\'s example (5 processes, 3 resource types)</span>');
+}
+
+function renderBankers() {
+  renderAvailable();
+  renderAllocMatrix();
+  renderMaxMatrix();
+  computeAndRenderNeed();
+}
+
+function renderAvailable() {
+  let resLabels = Array.from({length:bM}, (_,i)=>'R'+(i+1));
+  let html = '<div style="display:flex;gap:12px;flex-wrap:wrap">';
+  for(let j=0;j<bM;j++) {
+    html += `<div style="display:flex;flex-direction:column;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 18px;min-width:60px">
+      <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:6px">${resLabels[j]}</div>
+      <input type="number" id="avail-${j}" value="${bAvail[j]}" min="0" max="99" onchange="bAvail[${j}]=parseInt(this.value)||0" style="width:50px;text-align:center;background:var(--bg);border:1px solid var(--accent1);border-radius:4px;color:var(--warning);font-family:var(--font-mono);font-size:16px;font-weight:700;padding:4px">
+    </div>`;
+  }
+  html += '</div>';
+  document.getElementById('available-container').innerHTML = html;
+}
+
+function buildMatrix(containerId, data, label='P', editable=true, colorClass='') {
+  let resLabels = Array.from({length:bM}, (_,i)=>'R'+(i+1));
+  let html = '<table class="matrix-table"><thead><tr><th>PROC</th>';
+  for(let j=0;j<bM;j++) html += `<th>${resLabels[j]}</th>`;
+  html += '</tr></thead><tbody>';
+  for(let i=0;i<bN;i++) {
+    html += `<tr id="${label.toLowerCase()}-row-${i}"><td class="row-label">${label}${i}</td>`;
+    for(let j=0;j<bM;j++) {
+      if(editable) {
+        html += `<td><input type="number" id="${containerId}-${i}-${j}" value="${data[i][j]}" min="0" max="99" 
+          onchange="${containerId}[${i}][${j}]=parseInt(this.value)||0;computeAndRenderNeed()" style="width:52px"></td>`;
+      } else {
+        let val = data[i][j];
+        let style = val > 0 ? `color:var(--accent1)` : `color:var(--muted)`;
+        html += `<td id="${containerId}-cell-${i}-${j}" style="${style}">${val}</td>`;
+      }
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  document.getElementById(containerId+'-matrix').innerHTML = html;
+}
+
+function renderAllocMatrix() { buildMatrix('alloc', bAlloc, 'P', true); }
+function renderMaxMatrix()   { buildMatrix('max',   bMax,   'P', true); }
+
+function computeAndRenderNeed() {
+  // read current values from inputs
+  for(let i=0;i<bN;i++) for(let j=0;j<bM;j++) {
+    let ai = document.getElementById(`alloc-${i}-${j}`);
+    let mi = document.getElementById(`max-${i}-${j}`);
+    if(ai) bAlloc[i][j] = parseInt(ai.value)||0;
+    if(mi) bMax[i][j]   = parseInt(mi.value)||0;
+  }
+  let need = bAlloc.map((row,i)=>row.map((v,j)=>Math.max(0,bMax[i][j]-v)));
+  buildMatrix('need', need, 'P', false);
+}
+
+function getNeed() {
+  return bAlloc.map((row,i)=>row.map((v,j)=>Math.max(0,bMax[i][j]-v)));
+}
+
+function logBankers(msg) {
+  let el = document.getElementById('bankers-log');
+  if(!el) return;
+  el.innerHTML += msg + '<br>';
+  el.scrollTop = el.scrollHeight;
+}
+
+async function runBankersStep() {
+  if(bRunning) return;
+  computeAndRenderNeed();
+  // Read available
+  for(let j=0;j<bM;j++) {
+    let el = document.getElementById(`avail-${j}`);
+    if(el) bAvail[j] = parseInt(el.value)||0;
+  }
+
+  let result = document.getElementById('bankers-result');
+  result.style.display = 'block';
+  document.getElementById('bankers-log').innerHTML = '';
+  document.getElementById('safe-seq-container').innerHTML = '';
+  document.getElementById('safety-badge').innerHTML = '';
+  document.getElementById('iter-count').textContent = '0';
+
+  logBankers('<span class="log-info">// ═══ SAFETY ALGORITHM INITIATED ═══</span>');
+  logBankers(`<span class="log-muted">Available: [${bAvail.join(', ')}]</span>`);
+  logBankers('');
+
+  // Safety Algorithm
+  let work = [...bAvail];
+  let finish = Array(bN).fill(false);
+  let safeSeq = [];
+  let need = getNeed();
+  let iter = 0;
+
+  bRunning = true;
+
+  while(safeSeq.length < bN) {
+    let found = false;
+    for(let i=0;i<bN;i++) {
+      if(!finish[i]) {
+        let canAllocate = need[i].every((v,j) => v <= work[j]);
+        if(canAllocate) {
+          iter++;
+          document.getElementById('iter-count').textContent = iter;
+          logBankers(`<span class="log-info">// Iteration ${iter}: Checking P${i}</span>`);
+          logBankers(`<span class="log-muted">  Need[P${i}]  = [${need[i].join(', ')}]</span>`);
+          logBankers(`<span class="log-muted">  Work       = [${work.join(', ')}]</span>`);
+          logBankers(`<span class="log-step">  Need ≤ Work? <span class="log-safe">YES ✓</span></span>`);
+
+          await sleep(400);
+          finish[i] = true;
+          work = work.map((v,j) => v + bAlloc[i][j]);
+          safeSeq.push(i);
+          logBankers(`<span class="log-safe">  → P${i} completes. Work = [${work.join(', ')}]</span>`);
+          logBankers('');
+
+          // Highlight row
+          let row = document.getElementById(`p-row-${i}`);
+          if(row) row.classList.add('process-safe');
+
+          // Add to sequence display
+          updateSafeSeqDisplay(safeSeq);
+          found = true;
+        }
+      }
+    }
+    if(!found) break;
+  }
+
+  bRunning = false;
+
+  let safe = safeSeq.length === bN;
+  if(safe) {
+    logBankers(`<span class="log-safe">// ═══ SYSTEM IS IN A SAFE STATE ═══</span>`);
+    logBankers(`<span class="log-safe">// Safe Sequence: ${safeSeq.map(i=>'P'+i).join(' → ')}</span>`);
+    document.getElementById('safety-badge').innerHTML = '<span class="badge badge-safe">✓ SAFE STATE</span>';
+  } else {
+    logBankers(`<span class="log-unsafe">// ═══ SYSTEM IS IN AN UNSAFE STATE ═══</span>`);
+    logBankers(`<span class="log-unsafe">// No safe sequence exists → Deadlock possible!</span>`);
+    document.getElementById('safety-badge').innerHTML = '<span class="badge badge-unsafe">✗ UNSAFE STATE</span>';
+    // Mark remaining processes
+    for(let i=0;i<bN;i++) if(!finish[i]) {
+      let row = document.getElementById(`p-row-${i}`);
+      if(row) row.classList.add('process-unsafe');
+    }
+  }
+}
+
+function updateSafeSeqDisplay(seq) {
+  let html = '<div class="safe-sequence">';
+  seq.forEach((p,idx) => {
+    if(idx > 0) html += '<span class="seq-arrow">→</span>';
+    html += `<div class="seq-item">P${p}</div>`;
+  });
+  html += '</div>';
+  document.getElementById('safe-seq-container').innerHTML = html;
+}
+
+function resetBankers() {
+  initBankers();
+  document.getElementById('bankers-log').innerHTML = '';
+  document.getElementById('bankers-result').style.display = 'none';
+  bRunning = false;
+}
+
+function requestResourceDialog() {
+  computeAndRenderNeed();
+  let dlg = document.getElementById('request-dialog');
+  dlg.style.display = 'block';
+  let sel = document.getElementById('req-process');
+  sel.innerHTML = '';
+  for(let i=0;i<bN;i++) sel.innerHTML += `<option value="${i}">P${i}</option>`;
+  let inp = document.getElementById('req-inputs');
+  inp.innerHTML = '';
+  for(let j=0;j<bM;j++) {
+    inp.innerHTML += `<input type="number" id="req-r${j}" value="0" min="0" max="99" style="width:55px" title="R${j+1}">`;
+  }
+}
+
+function processRequest() {
+  computeAndRenderNeed();
+  for(let j=0;j<bM;j++) {
+    let el = document.getElementById(`avail-${j}`);
+    if(el) bAvail[j] = parseInt(el.value)||0;
+  }
+
+  let pi = parseInt(document.getElementById('req-process').value);
+  let req = Array.from({length:bM}, (_,j)=>parseInt(document.getElementById(`req-r${j}`).value)||0);
+  let need = getNeed();
+
+  let result = document.getElementById('bankers-result');
+  result.style.display = 'block';
+  let log = document.getElementById('bankers-log');
+  log.innerHTML = '';
+
+  logBankers(`<span class="log-info">// RESOURCE REQUEST: P${pi} requests [${req.join(', ')}]</span>`);
+
+  // Step 1: Check need
+  for(let j=0;j<bM;j++) {
+    if(req[j] > need[pi][j]) {
+      logBankers(`<span class="log-unsafe">✗ Request[${j}]=${req[j]} > Need[P${pi}][${j}]=${need[pi][j]} → EXCEEDS MAXIMUM CLAIM</span>`);
+      document.getElementById('safety-badge').innerHTML = '<span class="badge badge-unsafe">✗ DENIED</span>';
+      return;
+    }
+  }
+  logBankers(`<span class="log-safe">✓ Request ≤ Need — OK</span>`);
+
+  // Step 2: Check available
+  for(let j=0;j<bM;j++) {
+    if(req[j] > bAvail[j]) {
+      logBankers(`<span class="log-warn">⏳ Request[${j}]=${req[j]} > Available[${j}]=${bAvail[j]} → PROCESS MUST WAIT</span>`);
+      document.getElementById('safety-badge').innerHTML = '<span class="badge badge-warn">⏳ WAIT</span>';
+      return;
+    }
+  }
+  logBankers(`<span class="log-safe">✓ Request ≤ Available — OK</span>`);
+
+  // Pretend to allocate
+  let oldAvail = [...bAvail];
+  let oldAlloc = bAlloc[pi].map(v=>v);
+  bAvail = bAvail.map((v,j)=>v-req[j]);
+  bAlloc[pi] = bAlloc[pi].map((v,j)=>v+req[j]);
+  logBankers(`<span class="log-info">// Pretend-allocating... checking safety...</span>`);
+
+  // Re-run safety check
+  let work = [...bAvail];
+  let finish2 = Array(bN).fill(false);
+  let safeSeq2 = [];
+  let need2 = getNeed();
+  while(true) {
+    let found = false;
+    for(let i=0;i<bN;i++) {
+      if(!finish2[i] && need2[i].every((v,j)=>v<=work[j])) {
+        finish2[i]=true; work=work.map((v,j)=>v+bAlloc[i][j]); safeSeq2.push(i); found=true;
+      }
+    }
+    if(!found) break;
+  }
+
+  if(safeSeq2.length===bN) {
+    logBankers(`<span class="log-safe">✓ Resulting state is SAFE → Request GRANTED</span>`);
+    logBankers(`<span class="log-safe">Safe Sequence: ${safeSeq2.map(i=>'P'+i).join(' → ')}</span>`);
+    document.getElementById('safety-badge').innerHTML = '<span class="badge badge-safe">✓ GRANTED</span>';
+    updateSafeSeqDisplay(safeSeq2);
+    renderBankers();
+    for(let j=0;j<bM;j++) {
+      let el = document.getElementById(`avail-${j}`);
+      if(el) el.value = bAvail[j];
+    }
+  } else {
+    // Rollback
+    bAvail = oldAvail;
+    bAlloc[pi] = oldAlloc;
+    logBankers(`<span class="log-unsafe">✗ Resulting state is UNSAFE → Request DENIED (rolled back)</span>`);
+    document.getElementById('safety-badge').innerHTML = '<span class="badge badge-unsafe">✗ DENIED (UNSAFE)</span>';
+  }
+}
+
+// =========================================================
+//  BELLMAN-FORD ALGORITHM
+// =========================================================
+let bfGraph = { nodes:[], edges:[] };
+let bfDist = [];
+let bfPrev = [];
+let bfSteps = [];
+let bfStepIdx = 0;
+let bfTimer = null;
+let bfRunning = false;
+let bfHighlightEdge = null;
+let bfHighlightNode = null;
+
+const BF_PRESETS = {
+  default: {
+    nodes: [{id:'A',x:80,y:160},{id:'B',x:240,y:60},{id:'C',x:400,y:160},{id:'D',x:240,y:260},{id:'E',x:490,y:60}],
+    edges: [{u:'A',v:'B',w:6},{u:'A',v:'D',w:7},{u:'B',v:'C',w:5},{u:'B',v:'D',w:8},{u:'B',v:'E',w:-4},{u:'C',v:'B',w:-2},{u:'D',v:'C',w:-3},{u:'D',v:'E',w:9},{u:'E',v:'C',w:7},{u:'E',v:'A',w:2}]
+  },
+  negative: {
+    nodes: [{id:'S',x:80,y:180},{id:'A',x:220,y:80},{id:'B',x:220,y:280},{id:'C',x:380,y:80},{id:'D',x:380,y:280},{id:'T',x:500,y:180}],
+    edges: [{u:'S',v:'A',w:10},{u:'S',v:'B',w:5},{u:'A',v:'C',w:3},{u:'B',v:'A',w:-6},{u:'B',v:'D',w:2},{u:'C',v:'T',w:2},{u:'D',v:'T',w:8},{u:'A',v:'D',w:4}]
+  },
+  negcycle: {
+    nodes: [{id:'S',x:70,y:180},{id:'A',x:200,y:80},{id:'B',x:340,y:80},{id:'C',x:340,y:280},{id:'D',x:200,y:280}],
+    edges: [{u:'S',v:'A',w:4},{u:'S',v:'D',w:2},{u:'A',v:'B',w:3},{u:'B',v:'C',w:-8},{u:'C',v:'A',w:2},{u:'D',v:'C',w:5},{u:'C',v:'D',w:1}]
+  },
+  map: {
+    nodes: [{id:'MUM',x:70,y:200},{id:'PUN',x:200,y:120},{id:'NGP',x:340,y:80},{id:'HYD',x:340,y:280},{id:'BLR',x:470,y:200},{id:'CHN',x:530,y:100}],
+    edges: [{u:'MUM',v:'PUN',w:148},{u:'MUM',v:'HYD',w:711},{u:'PUN',v:'NGP',w:849},{u:'NGP',v:'HYD',w:503},{u:'HYD',v:'BLR',w:500},{u:'BLR',v:'CHN',w:346},{u:'NGP',v:'CHN',w:1073},{u:'PUN',v:'HYD',w:660}]
+  }
+};
+
+function loadBFPreset() {
+  let key = document.getElementById('bf-preset').value;
+  let data = BF_PRESETS[key];
+  bfGraph = JSON.parse(JSON.stringify(data));
+  bfSteps = []; bfStepIdx = 0; bfRunning = false;
+  if(bfTimer) { clearTimeout(bfTimer); bfTimer=null; }
+  populateSourceSelect();
+  renderEdgeTable();
+  drawBFGraph();
+  initBFDist();
+  document.getElementById('bf-log').innerHTML = '';
+  document.getElementById('neg-cycle-alert').classList.remove('show');
+  document.getElementById('bf-iter').textContent = '0';
+  document.getElementById('bf-relax').textContent = '0';
+  document.getElementById('bf-status').textContent = 'IDLE';
+}
+
+function populateSourceSelect() {
+  let sel = document.getElementById('bf-source');
+  sel.innerHTML = '';
+  bfGraph.nodes.forEach(n => sel.innerHTML += `<option value="${n.id}">${n.id}</option>`);
+}
+
+function renderEdgeTable() {
+  let tbody = document.getElementById('edge-tbody');
+  tbody.innerHTML = '';
+  bfGraph.edges.forEach((e,i) => {
+    let color = e.w < 0 ? 'var(--danger)' : e.w === 0 ? 'var(--muted)' : 'var(--accent3)';
+    tbody.innerHTML += `<tr id="edge-row-${i}">
+      <td style="color:var(--accent2)">${e.u}</td>
+      <td style="color:var(--accent2)">${e.v}</td>
+      <td style="color:${color};font-weight:700">${e.w}</td>
+    </tr>`;
+  });
+}
+
+function initBFDist() {
+  let src = document.getElementById('bf-source').value;
+  bfDist = {};
+  bfPrev = {};
+  bfGraph.nodes.forEach(n => {
+    bfDist[n.id] = n.id===src ? 0 : Infinity;
+    bfPrev[n.id] = null;
+  });
+  renderDistDisplay();
+}
+
+function renderDistDisplay(updated=[]) {
+  let src = document.getElementById('bf-source').value;
+  let html = '';
+  bfGraph.nodes.forEach(n => {
+    let isUp = updated.includes(n.id);
+    let isSrc = n.id===src;
+    let cls = isSrc ? 'dist-cell source' : (isUp ? 'dist-cell updated' : 'dist-cell');
+    let distStr = bfDist[n.id]===Infinity ? '∞' : bfDist[n.id];
+    let prev = bfPrev[n.id] ? bfPrev[n.id] : '-';
+    html += `<div class="${cls}" id="dc-${n.id}">
+      <div class="node-name">${n.id}</div>
+      <div class="node-dist">${distStr}</div>
+      <div class="node-prev">via:${prev}</div>
+    </div>`;
+  });
+  document.getElementById('dist-display').innerHTML = html;
+}
+
+function drawBFGraph(highlightEdge=null, highlightPath=[]) {
+  let canvas = document.getElementById('bf-canvas');
+  if(!canvas) return;
+  let ctx = canvas.getContext('2d');
+  let W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  // Scale nodes to canvas
+  let nodes = bfGraph.nodes;
+  let edges = bfGraph.edges;
+
+  // Draw edges
+  edges.forEach((e,i) => {
+    let u = nodes.find(n=>n.id===e.u);
+    let v = nodes.find(n=>n.id===e.v);
+    if(!u||!v) return;
+
+    let isHigh = highlightEdge && highlightEdge.u===e.u && highlightEdge.v===e.v;
+    let isPath = highlightPath.includes(e.u) && highlightPath.includes(e.v);
+
+    ctx.save();
+    ctx.strokeStyle = isHigh ? '#00e5ff' : (e.w<0 ? '#ff3d5a' : (isPath ? '#39ff82' : '#2a3040'));
+    ctx.lineWidth = isHigh ? 3 : (isPath ? 2.5 : 1.5);
+    if(isHigh) { ctx.shadowColor='#00e5ff'; ctx.shadowBlur=12; }
+
+    // Draw arrow
+    let dx=v.x-u.x, dy=v.y-u.y, len=Math.sqrt(dx*dx+dy*dy);
+    let nx=dx/len, ny=dy/len;
+    let r=22;
+    let sx=u.x+nx*r, sy=u.y+ny*r, ex=v.x-nx*r, ey=v.y-ny*r;
+    ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(ex,ey); ctx.stroke();
+
+    // Arrowhead
+    let angle=Math.atan2(ey-sy,ex-sx);
+    ctx.fillStyle = isHigh ? '#00e5ff' : (e.w<0 ? '#ff3d5a' : '#2a3040');
+    ctx.beginPath();
+    ctx.moveTo(ex,ey);
+    ctx.lineTo(ex-12*Math.cos(angle-0.4),ey-12*Math.sin(angle-0.4));
+    ctx.lineTo(ex-12*Math.cos(angle+0.4),ey-12*Math.sin(angle+0.4));
+    ctx.closePath(); ctx.fill();
+
+    // Weight label
+    let mx=(sx+ex)/2, my=(sy+ey)/2;
+    ctx.fillStyle = e.w<0 ? '#ff6b7a' : '#8899aa';
+    ctx.font = 'bold 12px Space Mono,monospace';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(e.w, mx-ny*14, my+nx*14);
+    ctx.restore();
+  });
+
+  // Draw nodes
+  nodes.forEach(n => {
+    let isHigh = bfHighlightNode===n.id;
+    let src = document.getElementById('bf-source');
+    let isSrc = src && src.value===n.id;
+    let distInf = bfDist[n.id]===Infinity;
+
+    ctx.save();
+    // Outer glow
+    if(isHigh || isSrc) {
+      ctx.shadowColor = isSrc ? '#39ff82' : '#00e5ff';
+      ctx.shadowBlur = 18;
+    }
+    ctx.beginPath(); ctx.arc(n.x,n.y,22,0,Math.PI*2);
+    ctx.fillStyle = isSrc ? 'rgba(57,255,130,0.18)' : (isHigh ? 'rgba(0,229,255,0.18)' : 'rgba(24,28,36,0.95)');
+    ctx.strokeStyle = isSrc ? '#39ff82' : (isHigh ? '#00e5ff' : '#3a4555');
+    ctx.lineWidth = isSrc || isHigh ? 2.5 : 1.5;
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = isSrc ? '#39ff82' : (isHigh ? '#00e5ff' : '#e8eaf0');
+    ctx.font = 'bold 13px Syne,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(n.id, n.x, n.y);
+
+    // Distance below node
+    let d = bfDist[n.id];
+    let dStr = d===Infinity ? '∞' : String(d);
+    ctx.fillStyle = distInf ? '#4a5568' : '#ffd23f';
+    ctx.font = '11px Space Mono,monospace';
+    ctx.fillText(dStr, n.x, n.y+36);
+    ctx.restore();
+  });
+}
+
+function bfLog(msg) {
+  let el = document.getElementById('bf-log');
+  el.innerHTML += msg + '<br>';
+  el.scrollTop = el.scrollHeight;
+}
+
+function buildBFSteps() {
+  let src = document.getElementById('bf-source').value;
+  initBFDist();
+  let dist = {...bfDist};
+  let prev = {...bfPrev};
+  let steps = [];
+  let n = bfGraph.nodes.length;
+  let edges = bfGraph.edges;
+
+  steps.push({type:'init', dist:{...dist}, prev:{...prev}, msg:`<span class="log-info">// Init: dist[${src}]=0, all others=∞</span>`});
+
+  for(let iter=0;iter<n-1;iter++) {
+    let anyRelax = false;
+    for(let ei=0;ei<edges.length;ei++) {
+      let e = edges[ei];
+      let newD = dist[e.u] + e.w;
+      if(dist[e.u] !== Infinity && newD < dist[e.v]) {
+        let old = dist[e.v];
+        dist[e.v] = newD;
+        prev[e.v] = e.u;
+        anyRelax = true;
+        steps.push({type:'relax', iter, edge:e, ei, dist:{...dist}, prev:{...prev},
+          msg:`<span class="log-step">  Iter ${iter+1}: Relax (${e.u}→${e.v},w=${e.w}): dist[${e.v}] = ${old===Infinity?'∞':old} → <span class="log-safe">${newD}</span></span>`});
+      } else {
+        steps.push({type:'norelax', iter, edge:e, ei, dist:{...dist}, prev:{...prev},
+          msg:`<span class="log-muted">  Iter ${iter+1}: (${e.u}→${e.v},w=${e.w}): no improvement (${dist[e.v]===Infinity?'∞':dist[e.v]} ≤ ${dist[e.u]===Infinity?'∞':dist[e.u]+e.w})</span>`});
+      }
+    }
+    steps.push({type:'iter_end', iter, dist:{...dist}, prev:{...prev},
+      msg:`<span class="log-info">  — End of iteration ${iter+1} —</span>`});
+    if(!anyRelax && iter>0) {
+      steps.push({type:'early_stop', iter, dist:{...dist}, prev:{...prev},
+        msg:`<span class="log-safe">// No relaxations in iteration ${iter+1} → Converged early!</span>`});
+      break;
+    }
+  }
+
+  // Negative cycle check
+  let hasCycle = false;
+  for(let e of edges) {
+    if(dist[e.u] !== Infinity && dist[e.u]+e.w < dist[e.v]) {
+      hasCycle = true;
+      steps.push({type:'neg_cycle', dist:{...dist}, prev:{...prev},
+        msg:`<span class="log-unsafe">// ⚠ NEGATIVE CYCLE DETECTED via edge ${e.u}→${e.v}</span>`});
+      break;
+    }
+  }
+  if(!hasCycle) {
+    steps.push({type:'done', dist:{...dist}, prev:{...prev},
+      msg:`<span class="log-safe">// ═══ SHORTEST PATHS COMPUTED ═══</span>`});
+    bfGraph.nodes.forEach(n => {
+      let d = dist[n.id]===Infinity?'∞':dist[n.id];
+      steps.push({type:'result', node:n.id, dist:{...dist}, prev:{...prev},
+        msg:`<span class="log-safe">  ${src} → ${n.id} : dist=${d}${prev[n.id]?' (via '+prev[n.id]+')':''}</span>`});
+    });
+  }
+
+  return steps;
+}
+
+function runBFStep() {
+  if(bfRunning) { bfRunning=false; if(bfTimer){clearTimeout(bfTimer);bfTimer=null;} document.getElementById('bf-status').textContent='PAUSED'; return; }
+  resetBF(true);
+  bfSteps = buildBFSteps();
+  bfStepIdx = 0;
+  bfRunning = true;
+  document.getElementById('bf-status').textContent='RUNNING';
+  document.getElementById('bf-max-iter').textContent = bfGraph.nodes.length-1;
+  document.getElementById('bf-log').innerHTML = '';
+  document.getElementById('neg-cycle-alert').classList.remove('show');
+  let speed = parseInt(document.getElementById('bf-speed').value)||800;
+  function next() {
+    if(!bfRunning || bfStepIdx>=bfSteps.length) { bfRunning=false; document.getElementById('bf-status').textContent='DONE'; return; }
+    applyBFStep(bfSteps[bfStepIdx++]);
+    bfTimer = setTimeout(next, speed);
+  }
+  next();
+}
+
+function stepBF() {
+  if(bfSteps.length===0) {
+    document.getElementById('bf-log').innerHTML='';
+    bfSteps = buildBFSteps();
+    bfStepIdx = 0;
+    initBFDist();
+    document.getElementById('bf-max-iter').textContent = bfGraph.nodes.length-1;
+    document.getElementById('neg-cycle-alert').classList.remove('show');
+  }
+  if(bfStepIdx < bfSteps.length) {
+    applyBFStep(bfSteps[bfStepIdx++]);
+  }
+}
+
+let bfRelaxCount = 0;
+function applyBFStep(step) {
+  bfDist = {...step.dist};
+  bfPrev = {...step.prev};
+  bfLog(step.msg);
+  if(step.type==='relax') {
+    bfRelaxCount++;
+    document.getElementById('bf-relax').textContent = bfRelaxCount;
+    bfHighlightEdge = step.edge;
+    bfHighlightNode = step.edge.v;
+    document.getElementById('bf-iter').textContent = step.iter+1;
+    renderDistDisplay([step.edge.v]);
+  } else if(step.type==='iter_end') {
+    bfHighlightEdge = null; bfHighlightNode = null;
+    renderDistDisplay();
+  } else if(step.type==='neg_cycle') {
+    document.getElementById('neg-cycle-alert').classList.add('show');
+    document.getElementById('bf-status').textContent='NEG CYCLE';
+    renderDistDisplay();
+  } else if(step.type==='done') {
+    document.getElementById('bf-status').textContent='DONE';
+    bfHighlightEdge = null; bfHighlightNode = null;
+    renderDistDisplay();
+  } else {
+    bfHighlightEdge = null; bfHighlightNode = null;
+    renderDistDisplay();
+  }
+  drawBFGraph(bfHighlightEdge);
+}
+
+function resetBF(soft=false) {
+  bfRunning=false;
+  if(bfTimer){clearTimeout(bfTimer);bfTimer=null;}
+  bfSteps=[];bfStepIdx=0;bfRelaxCount=0;
+  bfHighlightEdge=null;bfHighlightNode=null;
+  initBFDist();
+  drawBFGraph();
+  document.getElementById('bf-iter').textContent='0';
+  document.getElementById('bf-relax').textContent='0';
+  document.getElementById('bf-status').textContent='IDLE';
+  document.getElementById('neg-cycle-alert').classList.remove('show');
+  if(!soft) document.getElementById('bf-log').innerHTML='';
+}
+
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+
+// Speed label
+document.getElementById('bf-speed').addEventListener('input', function() {
+  document.getElementById('speed-label').textContent = this.value+'ms';
+});
+
+// Source change
+document.getElementById('bf-source').addEventListener('change', () => resetBF());
+
+// Init on load
+window.addEventListener('load', () => {
+  loadBankersPreset();
+  loadBFPreset();
+});
+</script>
+</body>
+</html>
